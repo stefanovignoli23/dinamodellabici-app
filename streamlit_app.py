@@ -15,7 +15,7 @@ def load_data():
     return df
 
 if st.sidebar.button("🔄 Aggiorna i risultati"):
-    load_data.clear()
+    st.cache_data.clear()
     st.rerun()
 
 df = load_data()
@@ -38,18 +38,19 @@ st.divider()
 
 st.subheader("Le statistiche della stagione")
 def _add_medal_emoji(val): 
-  if val == 0: 
-    return f"🥇" 
-  elif val == 1: 
-    return f"🥈" 
+  if val == 1: 
+    return f"🥇 {val}" 
   elif val == 2: 
-    return f"🥉" 
+    return f"🥈 {val}" 
+  elif val == 3: 
+    return f"🥉 {val}" 
   else: return val 
 
 lista_marcatori = df.marcatori_dinamo.str.split(',').explode().tolist()
 df_marcatori = pd.DataFrame(lista_marcatori)
 df_marcatori = pd.DataFrame(df_marcatori.value_counts().reset_index()).rename(columns={0:'Giocatori','count':'Gol'})
 df_marcatori = df_marcatori[(df_marcatori.Giocatori.notna())&(df_marcatori.Giocatori != '')].reset_index().rename(columns={'index':'Classifica'})
+df_marcatori['Classifica'] = df_marcatori['Classifica']+1
 df_marcatori = (
   df_marcatori.copy().style 
   .format(_add_medal_emoji, subset=['Classifica']) 
@@ -59,6 +60,7 @@ lista_assist = df.assist.str.split(',').explode().tolist()
 df_assist = pd.DataFrame(lista_assist)
 df_assist = pd.DataFrame(df_assist.value_counts().reset_index()).rename(columns={0:'Giocatori','count':'Assist'}).reset_index().rename(columns={'index':'Classifica'})
 df_assist = df_assist[(df_assist.Giocatori.notna())&(df_assist.Giocatori != '')]
+df_assist['Classifica'] = df_assist['Classifica']+1
 df_assist = (
   df_assist.copy().style 
   .format(_add_medal_emoji, subset=['Classifica']) 
