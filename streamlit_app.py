@@ -13,6 +13,11 @@ def load_data():
     conn = st.connection("gsheets",type = GSheetsConnection)
     df = conn.read(spreadsheet=st.secrets['spreadsheet'])
     return df
+
+if st.sidebar.button("🔄 Aggiorna i risultati"):
+    load_data.clear()
+    st.rerun()
+
 df = load_data()
 
 for col in [c for c in df if 'gol' not in c]:
@@ -26,6 +31,8 @@ st.write(
          "**Risultato** ⚽:", last_match.squadra_casa," ",last_match.gol_squadra_casa,' - ',last_match.gol_squadra_ospite," ",last_match.squadra_ospite,'\n\n',
          "**Marcatori** :blue_heart::",last_match.marcatori_dinamo 
        )
+st.link_button(label="Clicca per vedere la classifica su LiveScore",
+            url="https://livescore.csibologna.it/league_details.php?project_id=792")
 
 st.divider()
 
