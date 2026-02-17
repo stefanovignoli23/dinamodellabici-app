@@ -2,6 +2,10 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from streamlit_gsheets import GSheetsConnection
+import requests
+from icalendar import Calendar
+import datetime
+import pytz
 
 st.set_page_config(page_title="Dinamo Della Bici", page_icon="⚽")
 st.title('Dinamo Della Bici Official App',text_alignment='center')
@@ -84,6 +88,71 @@ st.audio("media/dinamodellabici.mpeg", format="audio/mpeg", loop=False)
 
 st.divider()
 
+st.subheader("Il calendario")
+
+def load_calendar(ical_url: str):
+    response = requests.get(ical_url)
+    response.raise_for_status()
+    return Calendar.from_ical(response.content)
+
+ITALY_TZ = pytz.timezone("Europe/Rome")
+
+def get_events(cal, days_ahead=30):
+    events = []
+    now = datetime.datetime.now(datetime.timezone.utc)
+    limit = now + datetime.timedelta(days=days_ahead)
+
+    for component in cal.walk():
+        if component.name == "VEVENT":
+            start = component.get('dtstart').dt
+            end = component.get('dtend').dt
+
+            # Normalizza a datetime con timezone
+            if isinstance(start, datetime.date) and not isinstance(start, datetime.datetime):
+                start = datetime.datetime(start.year, start.month, start.day, tzinfo=datetime.timezone.utc)
+                end = datetime.datetime(end.year, end.month, end.day, tzinfo=datetime.timezone.utc)
+
+            # Se il datetime non ha timezone, assumiamo UTC
+            if start.tzinfo is None:
+                start = pytz.utc.localize(start)
+                end = pytz.utc.localize(end)
+
+            # Converti in ora italiana 🇮🇹
+            start = start.astimezone(ITALY_TZ)
+            end = end.astimezone(ITALY_TZ)
+
+            if now <= start.astimezone(datetime.timezone.utc) <= limit:
+                events.append({
+                    "titolo": str(component.get('summary', 'Senza titolo')),
+                    "inizio": start,
+                    "fine": end,
+                    "descrizione": str(component.get('description', '')),
+                    "luogo": str(component.get('location', '')),
+                })
+
+    return sorted(events, key=lambda x: x['inizio'])
+
+ICAL_URL = st.secrets.get("ICAL_URL", "")
+
+GIORNI = {
+    "Monday": "Lunedì", "Tuesday": "Martedì", "Wednesday": "Mercoledì",
+    "Thursday": "Giovedì", "Friday": "Venerdì", "Saturday": "Sabato", "Sunday": "Domenica"
+}
+
+def date_format(dt):
+    giorno = GIORNI[dt.strftime("%A")]
+    return f"{giorno} {dt.strftime('%d/%m %H:%M')}"
+
+try:
+  cal = load_calendar(ICAL_URL)
+  events = get_events(cal)
+  st.success(f"{len(events)} eventi trovati")
+  for e in events:
+      st.write(f"📌 {date_format(e['inizio'])} - {e['titolo']}")
+except Exception as ex:
+    st.error(f"Errore nel caricamento: {ex}")
+st.divider()
+
 st.subheader("I campi")
 dict_campi_url = {
    'Cavina':"https://www.google.it/maps/place/44%C2%B031'22.1%22N+11%C2%B016'08.5%22E/@44.5228217,11.2664574,775m/data=!3m2!1e3!4b1!4m4!3m3!8m2!3d44.5228179!4d11.2690323?entry=ttu&g_ep=EgoyMDI2MDEyMC4wIKXMDSoKLDEwMDc5MjA3M0gBUAM%3D",
@@ -119,3 +188,5 @@ st.map(campo,
     zoom = 10.2,
     height = 250
     )
+
+
