@@ -157,11 +157,11 @@ st.divider()
 
 st.subheader("I campi")
 dict_campi_url = {
-   'Cavina':"https://www.google.it/maps/place/44%C2%B031'22.1%22N+11%C2%B016'08.5%22E/@44.5228217,11.2664574,775m/data=!3m2!1e3!4b1!4m4!3m3!8m2!3d44.5228179!4d11.2690323?entry=ttu&g_ep=EgoyMDI2MDEyMC4wIKXMDSoKLDEwMDc5MjA3M0gBUAM%3D",
-   'Castel Maggiore':"https://www.google.it/maps/place/44%C2%B034'29.8%22N+11%C2%B021'27.3%22E/@44.5749437,11.3550045,774m/data=!3m2!1e3!4b1!4m4!3m3!8m2!3d44.5749399!4d11.3575794?entry=ttu&g_ep=EgoyMDI2MDEyMC4wIKXMDSoKLDEwMDc5MjA3M0gBUAM%3D",
-   'Pallavicini':"https://www.google.it/maps/place/44%C2%B031'00.2%22N+11%C2%B015'01.3%22E/@44.5167183,11.2477889,775m/data=!3m2!1e3!4b1!4m4!3m3!8m2!3d44.5167145!4d11.2503638?entry=ttu&g_ep=EgoyMDI2MDExMy4wIKXMDSoKLDEwMDc5MjA3M0gBUAM%3D",
-   'Savena':"https://www.google.it/maps/place/44%C2%B030'02.1%22N+11%C2%B022'00.1%22E/@44.5005726,11.3641227,775m/data=!3m2!1e3!4b1!4m4!3m3!8m2!3d44.5005688!4d11.3666976?entry=ttu&g_ep=EgoyMDI2MDExMy4wIKXMDSoKLDEwMDc5MjA3M0gBUAM%3D",
-   'Siro':"https://www.google.it/maps/place/44%C2%B029'32.2%22N+11%C2%B023'53.8%22E/@44.4922694,11.3957142,775m/data=!3m2!1e3!4b1!4m4!3m3!8m2!3d44.4922656!4d11.3982891?entry=ttu&g_ep=EgoyMDI2MDEyMC4wIKXMDSoKLDEwMDc5MjA3M0gBUAM%3D"
+   'Cavina':"https://maps.app.goo.gl/3ZAfML1tQ3hmHS1c9",
+   'Castel Maggiore':"https://maps.app.goo.gl/ahYyaGg7sDBCfVgJ7",
+   'Pallavicini':"https://maps.app.goo.gl/6yo8mdw7fTfngjNM9",
+   'Savena':"https://maps.app.goo.gl/4aqjM17ocfqVj19BA",
+   'Siro':"https://maps.app.goo.gl/vvHhdUASkUiuT1U96"
 }
 dict_campi ={
     'Pallavicini':[44.516714549247105, 11.250363781254205,'#2986cc'],
@@ -174,11 +174,25 @@ dict_campi ={
 option = st.selectbox(
     "In quale campo vuoi andare?",
     ("Cavina", "Castel Maggiore", "Pallavicini", "Savena", "Siro"),
+    placeholder='Seleziona il campo...'
 )
 colore_campo = dict_campi.get(option)
 st.markdown("Hai selezionato "+f"<span style='color:{colore_campo[2]}'>{option}</span>", unsafe_allow_html=True)
-st.link_button(label="Clicca qui quando vuoi partire 🚗",
-            url=dict_campi_url[option])
+
+@st.dialog("⚠️ Confermi?")
+def confirm_exit(url,option):
+    st.warning("Campo "+option+"! Confermi di voler partire?")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.link_button("✅ Continua", url, use_container_width=True)
+    with col2:
+        if st.button("❌ Annulla", use_container_width=True):
+            st.rerun()
+
+if st.button("Clicca qui quando vuoi partire 🚗"):
+    confirm_exit(dict_campi_url[option],option)
+
 
 campo = pd.DataFrame(dict_campi).T.reset_index()
 campo = campo.rename(columns = {'index':'Campo',0:'lat',1:'lon',2:'colore'})
@@ -190,5 +204,3 @@ st.map(campo,
     zoom = 10.2,
     height = 250
     )
-
-
