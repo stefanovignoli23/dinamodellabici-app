@@ -159,6 +159,7 @@ st.subheader("I campi")
 dict_campi_url = {
    'Cavina':"https://maps.app.goo.gl/3ZAfML1tQ3hmHS1c9",
    'Castel Maggiore':"https://maps.app.goo.gl/ahYyaGg7sDBCfVgJ7",
+   'Dlf':"https://maps.app.goo.gl/Cb3Qobkm96NrCvPL7",
    'Pallavicini':"https://maps.app.goo.gl/6yo8mdw7fTfngjNM9",
    'Savena':"https://maps.app.goo.gl/4aqjM17ocfqVj19BA",
    'Siro':"https://maps.app.goo.gl/vvHhdUASkUiuT1U96"
@@ -167,17 +168,18 @@ dict_campi ={
     'Pallavicini':[44.516714549247105, 11.250363781254205,'#2986cc'],
     'Savena':[44.500568844009685, 11.366697557669758,'#69ca3f'],
     'Castel Maggiore':[44.57493989465883, 11.357579377283864,'#f44336'],
-    'Cavina':[44.52281793271603, 11.269032290985205,'#f18732'],
-    'Siro':[44.49226558188355, 11.398289084660481,'#d3da6d']
+    'Cavina':[44.52281793271603, 11.269032290985205,'#F18732'],
+    'Siro':[44.49226558188355, 11.398289084660481,'#d3da6d'],
+    'Dlf':[44.506830187552815, 11.354371407376616,"#673dda"]
 }
 
 option = st.selectbox(
     "In quale campo vuoi andare?",
-    ("Cavina", "Castel Maggiore", "Pallavicini", "Savena", "Siro"),
+    ("Cavina", "Castel Maggiore", "Dlf", "Pallavicini", "Savena", "Siro"),
     placeholder='Seleziona il campo...'
 )
-colore_campo = dict_campi.get(option)
-st.markdown("Hai selezionato "+f"<span style='color:{colore_campo[2]}'>{option}</span>", unsafe_allow_html=True)
+#colore_campo = dict_campi.get(option)
+#st.markdown("Hai selezionato "+f"<span style='color:{colore_campo[2]}'>{option}</span>", unsafe_allow_html=True)
 
 @st.dialog("⚠️ Confermi?")
 def confirm_exit(url,option):
@@ -193,6 +195,32 @@ def confirm_exit(url,option):
 if st.button("Clicca qui quando vuoi partire 🚗"):
     confirm_exit(dict_campi_url[option],option)
 
+st.markdown("""
+<style>
+.legend-item {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+}
+.legend-item span {
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+}
+</style>
+
+<div style="display: flex; gap: 20px; margin-bottom: 10px;font-size: 12px;">
+    <div class="legend-item"><span style="color: #F18732;">●</span> Cavina</div>
+    <div class="legend-item"><span style="color: #f44336;">●</span> Castel Maggiore</div>
+    <div class="legend-item"><span style="color: #673dda;">●</span> Dlf</div>      
+</div>
+<div style="display: flex; gap: 20px; margin-bottom: 10px;font-size: 12px;">
+    <div class="legend-item"><span style="color: #2986cc;">●</span> Pallavicini</div>
+    <div class="legend-item"><span style="color: #69ca3f;">●</span> Savena</div>
+    <div class="legend-item"><span style="color: #d3da6d;">●</span> Siro</div>        
+</div>
+""", unsafe_allow_html=True)
 
 campo = pd.DataFrame(dict_campi).T.reset_index()
 campo = campo.rename(columns = {'index':'Campo',0:'lat',1:'lon',2:'colore'})
