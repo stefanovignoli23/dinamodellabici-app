@@ -28,7 +28,7 @@ for col in [c for c in df if 'gol' not in c]:
     df[col] = df[col].str.upper()
 
 st.divider()
-last_match = df.iloc[-1,]
+last_match = df.fillna("").iloc[-1,]
 st.subheader("Il risultato dell'ultima partita")
 
 st.write(
@@ -37,6 +37,7 @@ st.write(
          "**Marcatori** :blue_heart::",last_match.marcatori_dinamo,'\n\n',
          "**Assist** 🫂:",last_match.assist
        )
+
 st.link_button(label="Clicca per vedere la classifica su LiveScore",
             url="https://livescore.csibologna.it/league_details.php?project_id=792")
 
