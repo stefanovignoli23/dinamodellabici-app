@@ -31,6 +31,13 @@ st.divider()
 last_match = df.fillna("").iloc[-1,]
 st.subheader("Il risultato dell'ultima partita")
 
+if last_match.squadra_casa == 'DINAMO' and last_match.gol_squadra_casa > last_match.gol_squadra_ospite:
+    st.balloons()
+elif last_match.squadra_ospite == 'DINAMO' and last_match.gol_squadra_ospite > last_match.gol_squadra_casa:
+    st.balloons()
+else:
+    pass
+
 st.write(
          "**Campo** 📍:", last_match.campo,'\n\n',
          "**Risultato** ⚽:", last_match.squadra_casa," ",last_match.gol_squadra_casa,' - ',last_match.gol_squadra_ospite," ",last_match.squadra_ospite,'\n\n',
