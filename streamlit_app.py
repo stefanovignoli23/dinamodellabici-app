@@ -100,10 +100,9 @@ def load_calendar(ical_url: str):
 
 ITALY_TZ = pytz.timezone("Europe/Rome")
 
-def get_events(cal, days_ahead=30):
+def get_events(cal):
     events = []
     now = datetime.datetime.now(datetime.timezone.utc)
-    limit = now + datetime.timedelta(days=days_ahead)
 
     for component in cal.walk():
         if component.name == "VEVENT":
@@ -124,7 +123,7 @@ def get_events(cal, days_ahead=30):
             start = start.astimezone(ITALY_TZ)
             end = end.astimezone(ITALY_TZ)
 
-            if now <= start.astimezone(datetime.timezone.utc) <= limit:
+            if now <= start.astimezone(datetime.timezone.utc):
                 events.append({
                     "titolo": str(component.get('summary', 'Senza titolo')),
                     "inizio": start,
