@@ -11,6 +11,7 @@ st.set_page_config(page_title="Dinamo Della Bici", page_icon="⚽")
 st.title('Dinamo Della Bici Official App',text_alignment='center')
 st.logo('media/dinamodellabici_logo.png', size='large')
 st.image('media/dinamodellabici_logo.png')
+st.image('media/adessopannoio.jpeg')
 
 @st.cache_data
 def load_data():
@@ -95,6 +96,8 @@ st.divider()
 st.subheader("L'inno")
 st.markdown("Non dimenticare di darti la carica per la prossima partita! 🎧🎸", text_alignment='center')
 st.audio("media/dinamodellabici.mpeg", format="audio/mpeg", loop=False)
+st.markdown("e ascolta il nuovo singolo \"Dinamo della Beach\"! 🏝️", text_alignment='center')
+st.audio("media/dinamodellabeach.mpeg", format="audio/mpeg", loop=False)
 
 st.divider()
 
