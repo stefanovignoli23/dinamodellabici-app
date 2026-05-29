@@ -25,6 +25,14 @@ if st.sidebar.button("🔄 Aggiorna i risultati"):
 
 df = load_data()
 
+st.divider()
+stagione_scelta = st.selectbox(
+    "Scegli la stagione:",
+    df.campionato.unique().tolist(),
+    placeholder='Seleziona il campo...'
+)
+df = df[df.campionato == stagione_scelta]
+
 for col in [c for c in df if 'gol' not in c]:
     df[col] = df[col].str.upper()
 
