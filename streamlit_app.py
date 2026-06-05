@@ -25,27 +25,29 @@ if st.sidebar.button("🔄 Aggiorna i risultati"):
 
 df = load_data()
 
+####### SELEZIONA STAGIONE
 st.divider()
 stagione_scelta = st.selectbox(
     "Scegli la stagione:",
     df.campionato.unique().tolist(),
-    placeholder='Seleziona il campo...'
+    index=len(df.campionato.unique().tolist())-1
 )
 df = df[df.campionato == stagione_scelta]
 
 for col in [c for c in df if 'gol' not in c]:
     df[col] = df[col].str.upper()
 
+####### ULTIMO RISULTATO
 st.divider()
 last_match = df.fillna("").iloc[-1,]
 st.subheader("Il risultato dell'ultima partita")
 
-if last_match.squadra_casa == 'DINAMO' and last_match.gol_squadra_casa > last_match.gol_squadra_ospite:
-    st.balloons()
-elif last_match.squadra_ospite == 'DINAMO' and last_match.gol_squadra_ospite > last_match.gol_squadra_casa:
-    st.balloons()
-else:
-    pass
+# if last_match.squadra_casa == 'DINAMO' and last_match.gol_squadra_casa > last_match.gol_squadra_ospite:
+#     st.balloons()
+# elif last_match.squadra_ospite == 'DINAMO' and last_match.gol_squadra_ospite > last_match.gol_squadra_casa:
+#     st.balloons()
+# else:
+#     pass
 
 st.write(
          "**Campo** 📍:", last_match.campo,'\n\n',
@@ -54,11 +56,13 @@ st.write(
          "**Assist** 🫂:",last_match.assist
        )
 
-st.link_button(label="Clicca per vedere la classifica su LiveScore",
-            url="https://livescore.csibologna.it/league_details.php?project_id=792")
 
+####### CLASSIFICA
+# st.link_button(label="Clicca per vedere la classifica su LiveScore",
+#             url="https://livescore.csibologna.it/league_details.php?project_id=792")
+
+####### STATISTICHE STAGIONE
 st.divider()
-
 st.subheader("Le statistiche della stagione")
 def _add_medal_emoji(val): 
   if val == 1: 
@@ -94,21 +98,22 @@ df_campi = pd.DataFrame(lista_campi)
 df_campi = pd.DataFrame(df_campi.value_counts().reset_index()).rename(columns={0:'Campo','count':'Partite giocate'})
 df_campi = df_campi[(df_campi.Campo.notna())&(df_campi.Campo != '')]
 
-tab1, tab2, tab3 = st.tabs(["**Gol**", "**Assist**", "**Campi**"])
+tab1, tab2, tab3, tab4 = st.tabs(["**Gol**", "**Assist**", "**Campi**", "**Tutte le partite**"])
 tab1.dataframe(df_marcatori, hide_index = True, use_container_width=True)
 tab2.dataframe(df_assist, hide_index = True, use_container_width=True)
 tab3.dataframe(df_campi, hide_index = True, use_container_width=True)
+tab4.dataframe(df, hide_index = True, use_container_width=True)
 
+####### INNO
 st.divider()
-
 st.subheader("L'inno")
 st.markdown("Non dimenticare di darti la carica per la prossima partita! 🎧🎸", text_alignment='center')
 st.audio("media/dinamodellabici.mpeg", format="audio/mpeg", loop=False)
 st.markdown("e ascolta il nuovo singolo \"Dinamo della Beach\"! 🏝️", text_alignment='center')
 st.audio("media/dinamodellabeach.mpeg", format="audio/mpeg", loop=False)
 
+####### CALENDARIO
 st.divider()
-
 st.subheader("Il calendario")
 
 def load_calendar(ical_url: str):
@@ -171,8 +176,9 @@ try:
       st.write(f"📌 {date_format(e['inizio'])} - {e['titolo']}")
 except Exception as ex:
     st.error(f"Errore nel caricamento: {ex}")
-st.divider()
 
+####### I CAMPI
+st.divider()
 st.subheader("I campi")
 dict_campi_url = {
    'Cavina':"https://maps.app.goo.gl/3ZAfML1tQ3hmHS1c9",
@@ -196,8 +202,6 @@ option = st.selectbox(
     ("Cavina", "Castel Maggiore", "Dlf", "Pallavicini", "Savena", "Siro"),
     placeholder='Seleziona il campo...'
 )
-#colore_campo = dict_campi.get(option)
-#st.markdown("Hai selezionato "+f"<span style='color:{colore_campo[2]}'>{option}</span>", unsafe_allow_html=True)
 
 @st.dialog("⚠️ Confermi?")
 def confirm_exit(url,option):
