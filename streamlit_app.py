@@ -9,8 +9,8 @@ import pytz
 
 st.set_page_config(page_title="Dinamo Della Bici", page_icon="⚽")
 st.title('Dinamo Della Bici Official App',text_alignment='center')
-st.logo('media/dinamodellabici_logo.png', size='large')
-st.image('media/dinamodellabici_logo.png')
+st.logo('media/Logo_Dinamo_DellaBici_OFFICIAL.png', size='large')
+st.image('media/Logo_Dinamo_DellaBici_OFFICIAL.png')
 st.image('media/adessopannoio.jpeg')
 
 @st.cache_data
@@ -35,19 +35,13 @@ stagione_scelta = st.selectbox(
 df = df[df.campionato == stagione_scelta]
 
 for col in [c for c in df if 'gol' not in c]:
-    df[col] = df[col].str.upper()
+    # df[col] = df[col].str.upper()
+    df[col] = df[col].astype('string').str.upper()
 
 ####### ULTIMO RISULTATO
 st.divider()
 last_match = df.fillna("").iloc[-1,]
 st.subheader("Il risultato dell'ultima partita")
-
-# if last_match.squadra_casa == 'DINAMO' and last_match.gol_squadra_casa > last_match.gol_squadra_ospite:
-#     st.balloons()
-# elif last_match.squadra_ospite == 'DINAMO' and last_match.gol_squadra_ospite > last_match.gol_squadra_casa:
-#     st.balloons()
-# else:
-#     pass
 
 st.write(
          "**Campo** 📍:", last_match.campo,'\n\n',
@@ -55,11 +49,6 @@ st.write(
          "**Marcatori** :blue_heart::",last_match.marcatori_dinamo,'\n\n',
          "**Assist** 🫂:",last_match.assist
        )
-
-
-####### CLASSIFICA
-# st.link_button(label="Clicca per vedere la classifica su LiveScore",
-#             url="https://livescore.csibologna.it/league_details.php?project_id=792")
 
 ####### STATISTICHE STAGIONE
 st.divider()
@@ -98,11 +87,22 @@ df_campi = pd.DataFrame(lista_campi)
 df_campi = pd.DataFrame(df_campi.value_counts().reset_index()).rename(columns={0:'Campo','count':'Partite giocate'})
 df_campi = df_campi[(df_campi.Campo.notna())&(df_campi.Campo != '')]
 
-tab1, tab2, tab3, tab4 = st.tabs(["**Gol**", "**Assist**", "**Campi**", "**Tutte le partite**"])
+lista_mvp = df.mvp.str.split(',').explode().tolist()
+df_mvp = pd.DataFrame(lista_mvp)
+df_mvp = pd.DataFrame(df_mvp.value_counts().reset_index()).rename(columns={0:'Giocatori','count':'MVP'}).reset_index().rename(columns={'index':'Classifica'})
+df_mvp = df_mvp[(df_mvp.Giocatori.notna())&(df_mvp.Giocatori != '')]
+df_mvp['Classifica'] = df_mvp['Classifica']+1
+df_mvp = (
+  df_mvp.copy().style 
+  .format(_add_medal_emoji, subset=['Classifica']) 
+)
+
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["**Gol**", "**Assist**", "**Campi**", "**MVP**", "**Tutte le partite**"])
 tab1.dataframe(df_marcatori, hide_index = True, use_container_width=True)
 tab2.dataframe(df_assist, hide_index = True, use_container_width=True)
 tab3.dataframe(df_campi, hide_index = True, use_container_width=True)
-tab4.dataframe(df, hide_index = True, use_container_width=True)
+tab4.dataframe(df_mvp, hide_index = True, use_container_width=True)
+tab5.dataframe(df, hide_index = True, use_container_width=True)
 
 ####### INNO
 st.divider()
